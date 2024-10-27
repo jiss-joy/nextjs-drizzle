@@ -3,6 +3,8 @@ import Link from "next/link";
 import CreateEmployeeButton from "../components/create-employee-button";
 import DeleteEmployeeButton from "../components/delete-employee-button";
 import { selectDepartments } from "@/db/queries/select-departments";
+import { selectOrganizations } from "@/db/queries/select-organizations";
+import { selectProducts } from "@/db/queries/select-products";
 
 const OrganizationDetails = async ({
   params,
@@ -11,9 +13,10 @@ const OrganizationDetails = async ({
 }) => {
   const { organization } = await params;
   let organizationName = "";
+  const organizations = await selectOrganizations();
   const employees = await selectEmployees(organization);
   const departments = await selectDepartments(organization);
-  // const products = await selectProducts(organization);
+  const products = await selectProducts(organization);
   if (employees) {
     organizationName = employees[0]?.organizationName;
   }
@@ -25,18 +28,15 @@ const OrganizationDetails = async ({
           Organization: {organizationName}
         </h1>
         <div className="space-x-4">
-          <Link
-            href="/9"
-            className="bg-slate-200 rounded-md px-4 py-2 hover:bg-slate-900 hover:text-white transition-colors"
-          >
-            Test 1
-          </Link>
-          <Link
-            href="/10"
-            className="bg-slate-200 rounded-md px-4 py-2 hover:bg-slate-900 hover:text-white transition-colors"
-          >
-            Test 2
-          </Link>
+          {organizations.map((org) => (
+            <Link
+              key={org.id}
+              href={`/${org.id}`}
+              className="bg-slate-200 rounded-md px-4 py-2 hover:bg-slate-900 hover:text-white transition-colors"
+            >
+              {org.name}
+            </Link>
+          ))}
         </div>
       </div>
       <div className="mt-8 space-y-2">
@@ -75,7 +75,7 @@ const OrganizationDetails = async ({
         <div className="flex w-full justify-between items-center mt-4">
           <h1 className="text-xl font-bold">Products</h1>
         </div>
-        {/* {products.map((product) => (
+        {products.map((product) => (
           <div
             key={product.id}
             className="flex flex-row p-4 border-b w-full items-end justify-between"
@@ -85,7 +85,7 @@ const OrganizationDetails = async ({
               <p className="text-gray-500">¥{product.price}</p>
             </div>
           </div>
-        ))} */}
+        ))}
       </div>
     </div>
   );
